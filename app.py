@@ -1,8 +1,13 @@
-from flask import Flask, request, render_template_string, redirect, url_for
+from flask import Flask, request, render_template_string, redirect
+import calendar
 
 app = Flask(__name__)
 
 todos = []
+
+year = 2025
+month = 6
+month_days = calendar.monthcalendar(year, month)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -25,8 +30,27 @@ def home():
         <title>TO-DO_LIST</title>
     </head>
     <body>
-        <h1>할 일 목록</h1>
+        <h1>Calendar</h1>
+        <table>
+        <tr>
+            <th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th><th>일</th>
+        </tr>
+        {% for week in month_days %}
+            <tr>
+                {% for day in week %}
+                <td>
+                    {% if day == 0 %}
+                    <!-- 비어 있는 칸 -->
+                    {% else %}
+                    {{ day }}
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
 
+        <h2>할 일 목록</h2>
         <ul>
         {% for todo in todos %}
             <li>
@@ -40,7 +64,7 @@ def home():
         {% endfor %}
         </ul>
 
-        <h2>할 일 추가하기</h2>
+        <h3>할 일 추가하기</h3>
         <form method="POST">
             <input type="text" name="title" placeholder="할 일을 입력하세요" required>
             <input type="date" name="date" placeholder="날짜를 입력하세요" required>
@@ -49,7 +73,7 @@ def home():
     </body>
     </html>
     '''
-    return render_template_string(html, todos=todos)
+    return render_template_string(html, todos=todos, month_days=month_days)
 
 @app.route('/complete/<int:todo_id>', methods=['POST'])
 def complete_todo(todo_id):
