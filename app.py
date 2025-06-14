@@ -20,7 +20,7 @@ def home():
     <!DOCTYPE html>
     <html>
     <head>
-        <title>할 일 목록</title>
+        <title>TO-DO_LIST</title>
     </head>
     <body>
         <h1>할 일 목록</h1>
