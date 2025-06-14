@@ -40,6 +40,9 @@ html = ''' ... '''
 form action="{{ url_for('complete_todo', todo_id=todo['id']) }}" ...
 - 완료 버튼, 누르면 /complete/1, /complete/2 이런 주소로 POST 요청을 보낸다.
 
+render_template_string
+- HTML 문자열을 Flask가 웹페이지로 보여줄 수 있게 만들어주는 함수.
+
 @app.route('/complete/<int:todo_id>', methods=['POST'])
 - 사용자가 완료 버튼을 누르면 여기가 처리한다.
   <int:todo_id> → 주소 안의 숫자를 가져와서 todo_id에 넣어요.
