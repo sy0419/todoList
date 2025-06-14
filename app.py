@@ -36,18 +36,18 @@ def home():
             <th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th><th>일</th>
         </tr>
         {% for week in month_days %}
-            <tr>
-                {% for day in week %}
-                <td>
-                    {% if day == 0 %}
-                    <!-- 비어 있는 칸 -->
-                    {% else %}
-                    {{ day }}
-                    {% endif %}
-                </td>
-                {% endfor %}
-            </tr>
+        <tr>
+            {% for day in week %}
+            <td>
+                {% if day == 0 %}
+                &nbsp; <!-- 비어 있는 칸 -->
+                {% else %}
+                {{ day }}
+                {% endif %}
+            </td>
             {% endfor %}
+        </tr>
+        {% endfor %}
         </table>
 
         <h2>할 일 목록</h2>
