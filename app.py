@@ -7,7 +7,8 @@ todos = []
 
 year = 2025
 month = 6
-month_days = calendar.monthcalendar(year, month)
+cal = calendar.Calendar(firstweekday=6)
+month_days = cal.monthdayscalendar(year, month)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -52,24 +53,33 @@ def home():
         <h1>Calendar</h1>
         <table>
         <tr>
-            <th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th><th>일</th>
+            <th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
         </tr>
         {% for week in month_days %}
         <tr>
             {% for day in week %}
-            <td>
-                {% if day == 0 %}
-                    &nbsp;
-                {% else %}
-                    {% set date_str = '{}-{:02d}-{:02d}'.format(year, month, day) %}
-                    {{ day }}
-                    {% for todo in todos %}
-                        {% if todo.date == date_str %}
-                            <div>{{ todo.title }}</div>
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
-            </td>
+            {% set weekday = loop.index0 %}
+                <td>
+                    {% if day == 0 %}
+                        &nbsp;
+                    {% else %}
+                        {% set date_str = '{}-{:02d}-{:02d}'.format(year, month, day) %}
+                        <span 
+                            {% if weekday == 6 %}
+                                style="color: blue;"
+                            {% elif weekday == 0 %}
+                                style="color: red;"
+                            {% endif %}
+                        >
+                            {{ day }}
+                        </span>
+                        {% for todo in todos %}
+                            {% if todo.date == date_str %}
+                                <div>{{ todo.title }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </td>
             {% endfor %}
         </tr>
         {% endfor %}
