@@ -28,6 +28,25 @@ def home():
     <html>
     <head>
         <title>TO-DO_LIST</title>
+        <style>
+            table {
+                border-collapse: separate;
+                border-spacing: 15px; /* 셀 간격 */
+            }
+            td {
+                width: 100px;
+                height: 100px;
+                vertical-align: top;
+                border: 1px solid #ccc;
+                padding: 5px;
+            }
+            .saturday {
+                background-color: #d0eaff; /* 연한 파랑 */
+            }
+            .sunday {
+                background-color: #ffd6d6; /* 연한 빨강 */
+            }
+        </style>
     </head>
     <body>
         <h1>Calendar</h1>
@@ -40,9 +59,15 @@ def home():
             {% for day in week %}
             <td>
                 {% if day == 0 %}
-                &nbsp; <!-- 비어 있는 칸 -->
+                    &nbsp;
                 {% else %}
-                {{ day }}
+                    {% set date_str = '{}-{:02d}-{:02d}'.format(year, month, day) %}
+                    {{ day }}
+                    {% for todo in todos %}
+                        {% if todo.date == date_str %}
+                            <div>{{ todo.title }}</div>
+                        {% endif %}
+                    {% endfor %}
                 {% endif %}
             </td>
             {% endfor %}
@@ -73,7 +98,13 @@ def home():
     </body>
     </html>
     '''
-    return render_template_string(html, todos=todos, month_days=month_days)
+    return render_template_string(
+            html,
+            todos=todos,
+            month_days=month_days,
+            year=year,
+            month=month
+    )
 
 @app.route('/complete/<int:todo_id>', methods=['POST'])
 def complete_todo(todo_id):
