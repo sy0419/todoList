@@ -1,3 +1,56 @@
+app = Flask(__name__)
+- Flask 웹 앱을 만든다. 이 app 객체가 서버 전체를 관리하게 된다.
+
+todos = []
+- 할 일 목록을 저장하는 리스트. 서버가 켜져 있는 동안 여기에 할 일들이 저장된다.
+
+@app.route('/', methods=['GET', 'POST'])
+- 이 줄은 / (홈페이지) 주소에서 GET과 POST 둘 다 처리할 수 있게 한다.
+  GET: 그냥 웹사이트에 접속하는 것 (보통 처음 들어갈 때)
+  POST: 폼에서 할 일을 입력해서 서버로 보낼 때
+
+def home():
+- 위의 route(/)를 처리할 함수이다.
+
+if request.method == 'POST':
+- 사용자가 "추가" 버튼을 눌렀는지 확인하는 부분.
+
+title = request.form.get('title')
+- 사용자가 <input name="title">에 적은 텍스트를 꺼내오는 코드.
+
+if title:
+- 사용자가 빈 칸 없이 뭔가를 입력했다면…
+
+todos.append({...})
+- 할 일을 하나 추가한다. 추가될 때 자동으로 id를 1, 2, 3 순서로 붙이고 is_completed는 아직 안 했으니까 False이다.
+
+return redirect('/')
+- 추가 후에는 다시 홈페이지로 돌아간다. 만약 이걸 안 하면 새로고침할 때 같은 할 일이 또 추가된다.
+
+html = ''' ... '''
+- 이 부분은 HTML 화면을 문자열로 만든 것이다. → Flask가 이걸 웹사이트로 보여줄 것이다.
+
+{% for todo in todos %} ... {% endfor %}
+- 할 일 목록 하나하나를 반복해서 화면에 보여준다.
+  eg) todos = [
+        {'title': '빨래하기', 'is_completed': False}
+      ]
+     인 경우 HTML은 이렇게 보인다: 빨래하기 - 완료: X [완료 버튼]
+
+form action="{{ url_for('complete_todo', todo_id=todo['id']) }}" ...
+- 완료 버튼, 누르면 /complete/1, /complete/2 이런 주소로 POST 요청을 보낸다.
+
+@app.route('/complete/<int:todo_id>', methods=['POST'])
+- 사용자가 완료 버튼을 누르면 여기가 처리한다.
+  <int:todo_id> → 주소 안의 숫자를 가져와서 todo_id에 넣어요.
+  예: /complete/2 → todo_id = 2
+
+for todo in todos: ...
+- 할 일 목록 중에서 id가 같은 걸 찾아서 is_completed 값을 True로 바꾼다.
+
+if __name__ == '__main__': app.run(debug=True)
+- 이건 "이 파일이 직접 실행될 때 Flask 서버를 켜라"는 뜻이다.
+
 Flask는 뭘 해주는 거야?
 - 서버를 만들어서 내가 만든 프로그램이랑 웹 브라우저랑 연결해주는 역할.
 
