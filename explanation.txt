@@ -32,10 +32,10 @@ html = ''' ... '''
 
 {% for todo in todos %} ... {% endfor %}
 - 할 일 목록 하나하나를 반복해서 화면에 보여준다.
-  eg) todos = [
+  eg: todos = [
         {'title': '빨래하기', 'is_completed': False}
       ]
-     인 경우 HTML은 이렇게 보인다: 빨래하기 - 완료: X [완료 버튼]
+      인 경우 HTML은 이렇게 보인다: 빨래하기 - 완료: X [완료 버튼]
 
 form action="{{ url_for('complete_todo', todo_id=todo['id']) }}" ...
 - 완료 버튼, 누르면 /complete/1, /complete/2 이런 주소로 POST 요청을 보낸다.
