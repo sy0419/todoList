@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string, redirect
+from flask import Flask, request, render_template_string, redirect, url_for
 
 app = Flask(__name__)
 
@@ -14,7 +14,7 @@ def home():
                 'title': title,
                 'is_completed': False
             })
-        return redirect('/')  # POST 후 다시 홈으로 돌아가게 하기
+        return redirect('/')
 
     html = '''
     <!DOCTYPE html>
@@ -27,7 +27,14 @@ def home():
 
         <ul>
         {% for todo in todos %}
-            <li>{{ todo['title'] }} - 완료: {{ 'O' if todo['is_completed'] else 'X' }}</li>
+            <li>
+                {{ todo['title'] }} - 완료: {{ 'O' if todo['is_completed'] else 'X' }}
+                {% if not todo['is_completed'] %}
+                    <form action="{{ url_for('complete_todo', todo_id=todo['id']) }}" method="post" style="display:inline;">
+                        <button type="submit">완료</button>
+                    </form>
+                {% endif %}
+            </li>
         {% endfor %}
         </ul>
 
@@ -40,6 +47,14 @@ def home():
     </html>
     '''
     return render_template_string(html, todos=todos)
+
+@app.route('/complete/<int:todo_id>', methods=['POST'])
+def complete_todo(todo_id):
+    for todo in todos:
+        if todo['id'] == todo_id:
+            todo['is_completed'] = True
+            break
+    return redirect('/')
 
 if __name__ == '__main__':
     app.run(debug=True)
