@@ -12,16 +12,28 @@ month_days = cal.monthdayscalendar(year, month)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    editing_id = request.args.get('edit', type=int)
     if request.method == 'POST':
         title = request.form.get('title')
         date = request.form.get('date')
-        if title:
-            todos.append({
-                'id': len(todos) + 1,
-                'title': title,
-                'is_completed': False,
-                'date': date
-            })
+
+        if editing_id:
+            # 수정하는 경우
+            for todo in todos:
+                if todo['id'] == editing_id:
+                    todo['title'] = title
+                    todo['date'] = date
+                    break
+        else:
+            # 새 할 일 추가
+            if title:
+                todos.append({
+                    'id': len(todos) + 1,
+                    'title': title,
+                    'is_completed': False,
+                    'date': date
+                })
+
         return redirect('/')
 
     html = '''
@@ -97,13 +109,22 @@ def home():
         <ul>
         {% for todo in todos %}
             <li>
-                {{ todo['title'] }} ({{ todo['date'] }})  - 완료: {{ 'O' if todo['is_completed'] else 'X' }}
-                <form method="POST" action="{{ url_for('complete_todo', todo_id=todo['id']) }}" style="display:inline;">
-                    <input type="checkbox" name="is_completed" onchange="this.form.submit()" {% if todo['is_completed'] %}checked{% endif %}>
-                </form>
-                <form method="GET" action="{{ url_for('edit_todo', todo_id=todo['id']) }}" style="display:inline;">
-                    <button>수정</button>
-                </form>
+                {% if editing_id == todo['id'] %}
+                    <form method="POST" action="/?edit={{ todo['id'] }}" style="display:inline;">
+                        <input type="text" name="title" value="{{ todo['title'] }}">
+                        <input type="date" name="date" value="{{ todo['date'] }}">
+                        <button type="submit">저장</button>
+                    </form>
+                {% else %}
+                    {{ todo['title'] }} ({{ todo['date'] }}) - 완료: {{ 'O' if todo['is_completed'] else 'X' }}
+                    <form method="POST" action="{{ url_for('complete_todo', todo_id=todo['id']) }}" style="display:inline;">
+                        <input type="checkbox" name="is_completed" onchange="this.form.submit()" {% if todo['is_completed'] %}checked{% endif %}>
+                    </form>
+                    <form method="GET" action="/" style="display:inline;">
+                        <input type="hidden" name="edit" value="{{ todo['id'] }}">
+                        <button type="submit">수정</button>
+                    </form>
+                {% endif %}
             </li>
         {% endfor %}
         </ul>
@@ -117,12 +138,9 @@ def home():
     </body>
     </html>
     '''
+
     return render_template_string(
-            html,
-            todos=todos,
-            month_days=month_days,
-            year=year,
-            month=month
+        html, todos=todos, month_days=month_days, year=year, month=month, editing_id=editing_id
     )
 
 @app.route('/complete/<int:todo_id>', methods=['POST'])
@@ -137,30 +155,6 @@ def complete_todo(todo_id):
                 todo['is_completed'] = False
                 break
     return redirect('/')
-
-@app.route('/edit/<int:todo_id>', methods=['GET', 'POST'])
-def edit_todo(todo_id):
-    for todo in todos:
-        if todo['id'] == todo_id:
-            break
-    else:
-        return "할 일을 찾을 수 없습니다.", 404
-
-    if request.method == 'POST':
-        new_title = request.form.get('title')
-        new_date = request.form.get('date')
-        todo['title'] = new_title
-        todo['date'] = new_date
-        return redirect('/')
-
-    form_html = '''
-    <form method="POST">
-        <input type="text" name="title" value="{{ todo.title }}" required>
-        <input type="date" name="date" value="{{ todo.date }}" required>
-        <button type="submit">수정 완료</button>
-    </form>
-    '''
-    return render_template_string(form_html, todo=todo)
 
 if __name__ == '__main__':
     app.run(debug=True)
