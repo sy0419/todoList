@@ -75,7 +75,9 @@ def home():
                         </span>
                         {% for todo in todos %}
                             {% if todo.date == date_str %}
-                                <div>{{ todo.title }}</div>
+                                <div style="color: {% if todo.is_completed %}#bbb{% else %}black{% endif %};">
+                                    {{ todo.title }}
+                                </div>
                             {% endif %}
                         {% endfor %}
                     {% endif %}
@@ -90,11 +92,9 @@ def home():
         {% for todo in todos %}
             <li>
                 {{ todo['title'] }} ({{ todo['date'] }})  - 완료: {{ 'O' if todo['is_completed'] else 'X' }}
-                {% if not todo['is_completed'] %}
-                    <form action="{{ url_for('complete_todo', todo_id=todo['id']) }}" method="post" style="display:inline;">
-                        <button type="submit">완료</button>
-                    </form>
-                {% endif %}
+                <form method="POST" action="{{ url_for('complete_todo', todo_id=todo['id']) }}" style="display:inline;">
+                    <input type="checkbox" name="is_completed" onchange="this.form.submit()" {% if todo['is_completed'] %}checked{% endif %}>
+                </form>
             </li>
         {% endfor %}
         </ul>
@@ -118,10 +118,15 @@ def home():
 
 @app.route('/complete/<int:todo_id>', methods=['POST'])
 def complete_todo(todo_id):
+    value = request.form.get('is_completed')
     for todo in todos:
         if todo['id'] == todo_id:
-            todo['is_completed'] = True
-            break
+            if value == 'on':
+                todo['is_completed'] = True
+                break
+            else:
+                todo['is_completed'] = False
+                break
     return redirect('/')
 
 if __name__ == '__main__':
