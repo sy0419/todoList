@@ -179,6 +179,9 @@ def home():
                         <button type="submit">수정</button>
                     </form>
                 {% endif %}
+                <form method="POST" action="{{ url_for('delete_todo', todo_id=todo['id']) }}" style="display:inline;">
+                    <button type="submit" onclick="return confirm('정말 삭제할까요?');">삭제</button>
+                </form>
             </li>
         {% endfor %}
         </ul>
@@ -210,6 +213,12 @@ def complete_todo(todo_id):
             else:
                 todo['is_completed'] = False
                 break
+    return redirect('/')
+
+@app.route('/delete/<int:todo_id>', methods=['POST'])
+def delete_todo(todo_id):
+    global todos
+    todos = [todo for todo in todos if todo['id'] != todo_id]
     return redirect('/')
 
 if __name__ == '__main__':
