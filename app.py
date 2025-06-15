@@ -31,6 +31,7 @@ def home():
         <title>TO-DO_LIST</title>
         <style>
             table {
+                width: 100%;
                 border-collapse: separate;
                 border-spacing: 15px; /* 셀 간격 */
             }
@@ -46,6 +47,11 @@ def home():
             }
             .sunday {
                 background-color: #ffd6d6; /* 연한 빨강 */
+            }
+            body {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 20px 0;
             }
         </style>
     </head>
