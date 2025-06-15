@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template_string, redirect
 import calendar
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -13,6 +14,30 @@ month_days = cal.monthdayscalendar(year, month)
 @app.route('/', methods=['GET', 'POST'])
 def home():
     editing_id = request.args.get('edit', type=int)
+    
+    today = datetime.today()
+    
+    year = request.args.get('year', default=today.year, type=int)
+    month = request.args.get('month', default=today.month, type=int)
+    
+    def prev_month(y, m):
+        if m == 1:
+            return y - 1, 12
+        else:
+            return y, m - 1
+
+    def next_month(y, m):
+        if m == 12:
+            return y + 1, 1
+        else:
+            return y, m + 1
+
+    prev_year, prev_month = prev_month(year, month)
+    next_year, next_month = next_month(year, month)
+
+    cal = calendar.Calendar(firstweekday=6)
+    month_days = cal.monthdayscalendar(year, month)
+
     if request.method == 'POST':
         title = request.form.get('title')
         date = request.form.get('date')
@@ -69,6 +94,11 @@ def home():
     </head>
     <body>
         <h1>Calendar</h1>
+        <div style="margin-bottom: 20px;">
+            <button onclick="location.href='/?year={{ prev_year }}&month={{ prev_month }}'">&lt; 이전</button>
+            <strong>{{ year }}년 {{ month }}월</strong>
+            <button onclick="location.href='/?year={{ next_year }}&month={{ next_month }}'">다음 &gt;</button>
+        </div>
         <table>
         <tr>
             <th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
@@ -116,7 +146,9 @@ def home():
                         <button type="submit">저장</button>
                     </form>
                 {% else %}
-                    {{ todo['title'] }} ({{ todo['date'] }}) - 완료: {{ 'O' if todo['is_completed'] else 'X' }}
+                    <span style="color: {% if todo.is_completed %}#bbb{% else %}black{% endif %};">
+                        {{ todo['title'] }} ({{ todo['date'] }})
+                    </span>
                     <form method="POST" action="{{ url_for('complete_todo', todo_id=todo['id']) }}" style="display:inline;">
                         <input type="checkbox" name="is_completed" onchange="this.form.submit()" {% if todo['is_completed'] %}checked{% endif %}>
                     </form>
@@ -140,7 +172,9 @@ def home():
     '''
 
     return render_template_string(
-        html, todos=todos, month_days=month_days, year=year, month=month, editing_id=editing_id
+        html, todos=todos, month_days=month_days, year=year, month=month,
+        editing_id=editing_id, prev_year=prev_year, prev_month=prev_month,
+        next_year=next_year, next_month=next_month
     )
 
 @app.route('/complete/<int:todo_id>', methods=['POST'])
