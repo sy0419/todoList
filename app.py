@@ -72,12 +72,24 @@ def home():
                 border-collapse: separate;
                 border-spacing: 15px; /* 셀 간격 */
             }
+            h1 {
+                font-size: 40px;
+                text-align: center;
+                margin-bottom: 20px;
+            }
             td {
                 width: 100px;
                 height: 100px;
                 vertical-align: top;
                 border: 1px solid #ccc;
                 padding: 5px;
+                font-size: 18px;  
+            }
+            td span {
+                display: block;
+                font-weight: bold;
+                font-size: 18px;
+                margin-bottom: 5px;
             }
             .saturday {
                 background-color: #d0eaff; /* 연한 파랑 */
@@ -94,10 +106,20 @@ def home():
     </head>
     <body>
         <h1>Calendar</h1>
-        <div style="margin-bottom: 20px;">
-            <button onclick="location.href='/?year={{ prev_year }}&month={{ prev_month }}'">&lt; 이전</button>
-            <strong>{{ year }}년 {{ month }}월</strong>
-            <button onclick="location.href='/?year={{ next_year }}&month={{ next_month }}'">다음 &gt;</button>
+        <style>
+            .nav-button {
+                font-size: 18px;
+                padding: 5px 10px;
+            }
+            .month-title {
+                font-size: 24px;
+                margin: 0 15px;
+            }
+        </style>
+        <div style="margin-bottom: 20px; text-align: center;">
+            <button class="nav-button" onclick="location.href='/?year={{ prev_year }}&month={{ prev_month }}'">&lt; 이전</button>
+            <strong class="month-title">{{ year }}년 {{ month }}월</strong>
+            <button class="nav-button" onclick="location.href='/?year={{ next_year }}&month={{ next_month }}'">다음 &gt;</button>
         </div>
         <table>
         <tr>
