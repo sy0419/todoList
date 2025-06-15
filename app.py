@@ -6,11 +6,6 @@ app = Flask(__name__)
 
 todos = []
 
-year = 2025
-month = 6
-cal = calendar.Calendar(firstweekday=6)
-month_days = cal.monthdayscalendar(year, month)
-
 @app.route('/', methods=['GET', 'POST'])
 def home():
     editing_id = request.args.get('edit', type=int)
