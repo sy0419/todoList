@@ -101,6 +101,9 @@ def home():
                 <form method="POST" action="{{ url_for('complete_todo', todo_id=todo['id']) }}" style="display:inline;">
                     <input type="checkbox" name="is_completed" onchange="this.form.submit()" {% if todo['is_completed'] %}checked{% endif %}>
                 </form>
+                <form method="GET" action="{{ url_for('edit_todo', todo_id=todo['id']) }}" style="display:inline;">
+                    <button>수정</button>
+                </form>
             </li>
         {% endfor %}
         </ul>
@@ -134,6 +137,30 @@ def complete_todo(todo_id):
                 todo['is_completed'] = False
                 break
     return redirect('/')
+
+@app.route('/edit/<int:todo_id>', methods=['GET', 'POST'])
+def edit_todo(todo_id):
+    for todo in todos:
+        if todo['id'] == todo_id:
+            break
+    else:
+        return "할 일을 찾을 수 없습니다.", 404
+
+    if request.method == 'POST':
+        new_title = request.form.get('title')
+        new_date = request.form.get('date')
+        todo['title'] = new_title
+        todo['date'] = new_date
+        return redirect('/')
+
+    form_html = '''
+    <form method="POST">
+        <input type="text" name="title" value="{{ todo.title }}" required>
+        <input type="date" name="date" value="{{ todo.date }}" required>
+        <button type="submit">수정 완료</button>
+    </form>
+    '''
+    return render_template_string(form_html, todo=todo)
 
 if __name__ == '__main__':
     app.run(debug=True)
